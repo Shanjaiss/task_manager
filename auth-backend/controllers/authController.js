@@ -37,30 +37,49 @@ export const Register = async (req, res) => {
 //LOGIN
 
 export const Login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const v_sql_2 = `
-    SELECT 1
-    FROM users
-    WHERE email = $1
-  `;
-  const v_values = [email];
+    const sql = `
+      SELECT id, email, password
+      FROM users
+      WHERE email = $1
+    `;
 
-  const v_results = await db.query(v_sql_2, v_values);
+    const result = await db.query(sql, [email]);
 
-  if (Array.isArray(v_results) && v_results.length > 0) {
-    for (const v_row of v_results) {
-      const isMatch = await bcrypt.compare(password, v_row.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid credentials' });
-      }
-      const token = jwt.sign({ id: v_row.id }, process.env.JWT_SECRET, {
-        expiresIn: '1d',
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        message: 'Invalid Credentials',
       });
-
-      res.json({ token, user });
     }
-  } else {
-    return res.status(400).json({ message: 'Invalid Credentials' });
+
+    const user = result.rows[0];
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: 'Invalid Credentials',
+      });
+    }
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error('LOGIN ERROR:', err);
+
+    res.status(500).json({
+      error: err.message,
+    });
   }
 };

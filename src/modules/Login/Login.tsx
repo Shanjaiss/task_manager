@@ -3,17 +3,35 @@ import { Card, Col, Form, Input, Row, Button, Checkbox, Divider } from 'antd';
 import { GoogleOutlined, AppleOutlined } from '@ant-design/icons';
 import './login.css';
 import Signup from './Signup/Signup';
+import { useCreateQuery } from '../../components/hooks/useCreateQuery';
+import { useNavigate } from 'react-router-dom';
+import type { LoginPayload, LoginRespose } from './login.type';
 
 export const Login = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [signup, setSignup] = useState(false);
+
+  const loginUser = useCreateQuery<LoginRespose, LoginPayload>({
+    url: '/auth/login',
+    queryKey: ['auth'],
+    successMessage: 'Login Successfull',
+  });
 
   const handleclicksignup = () => {
     setSignup(true);
   };
 
-  const onFinish = (values: any) => {
-    console.log('Login Values:', values);
+  const onFinish = (values: LoginPayload) => {
+    loginUser.mutate(values, {
+      onSuccess: (data) => {
+        // Save token
+        localStorage.setItem('token', data.token);
+
+        // Navigate after login
+        navigate('/dashboard');
+      },
+    });
   };
 
   return (

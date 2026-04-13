@@ -2,20 +2,27 @@ import React from 'react';
 import { Col, Form, Input, Row, Button, Checkbox, Divider } from 'antd';
 import { GoogleOutlined, AppleOutlined } from '@ant-design/icons';
 import '../login.css';
+import { useCreateQuery } from '../../../components/hooks/useCreateQuery';
+import type { RegisterPayload } from './signup.types';
 
 type SignupProps = {
   setSignup: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const Signup: React.FC<SignupProps> = ({setSignup}) => {
+export const Signup: React.FC<SignupProps> = ({ setSignup }) => {
   const [form] = Form.useForm();
+
+  const createUser = useCreateQuery({
+    url: '/auth/register',
+    queryKey: ['users'], // better than ["tasks"]
+  });
 
   const hadlenavigtelogin = () => {
     setSignup(false);
   };
 
-  const onFinish = (values: any) => {
-    console.log(values);
+  const onFinish = (values: RegisterPayload) => {
+    createUser.mutate(values);
   };
   return (
     <Row>
