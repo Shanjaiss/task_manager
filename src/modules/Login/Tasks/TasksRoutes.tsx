@@ -1,12 +1,14 @@
 import { lazy, Suspense } from 'react';
-import AppLayout from '../Layout/AppLayout';
-import Loader from '../../components/loader/Loader';
-import ProtectedRoute from '../ProtectedRoutes';
+import AppLayout from '../../Layout/AppLayout';
+import Loader from '../../../components/loader/Loader';
+import ProtectedRoute from '../../ProtectedRoutes';
 
-const Dashboard = lazy(() => import('./Dashboard'));
-const NotFound = lazy(() => import('../../components/404/NotFound'));
+const Tasks = lazy(() => import('./Tasks'));
+const CreateTask = lazy(() => import('./CreateTask/LinearCreateModal'));
 
-const DashboardRoutes = [
+const NotFound = lazy(() => import('../../../components/404/NotFound'));
+
+const TasksRoutes = [
   {
     path: '/',
     element: <ProtectedRoute />, // 🔐 protect all below
@@ -15,10 +17,10 @@ const DashboardRoutes = [
         element: <AppLayout />,
         children: [
           {
-            path: 'dashboard',
+            path: 'tasks',
             element: (
               <Suspense fallback={<Loader fullScreen />}>
-                <Dashboard />
+                <Tasks />
               </Suspense>
             ),
           },
@@ -32,4 +34,4 @@ const DashboardRoutes = [
   },
 ];
 
-export default DashboardRoutes;
+export default TasksRoutes;

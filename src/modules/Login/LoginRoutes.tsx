@@ -1,7 +1,7 @@
 import { Login } from './Login';
 const LoginRoutes = [
   {
-    path: '/',
+    path: '/login',
     element: <Login />,
   },
 ];

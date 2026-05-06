@@ -3,10 +3,10 @@ import AppLayout from '../Layout/AppLayout';
 import Loader from '../../components/loader/Loader';
 import ProtectedRoute from '../ProtectedRoutes';
 
-const Dashboard = lazy(() => import('./Dashboard'));
+const Notifications = lazy(() => import('./Notifications'));
 const NotFound = lazy(() => import('../../components/404/NotFound'));
 
-const DashboardRoutes = [
+const NotificationRoutes = [
   {
     path: '/',
     element: <ProtectedRoute />, // 🔐 protect all below
@@ -15,10 +15,10 @@ const DashboardRoutes = [
         element: <AppLayout />,
         children: [
           {
-            path: 'dashboard',
+            path: 'notifications',
             element: (
               <Suspense fallback={<Loader fullScreen />}>
-                <Dashboard />
+                <Notifications />
               </Suspense>
             ),
           },
@@ -32,4 +32,4 @@ const DashboardRoutes = [
   },
 ];
 
-export default DashboardRoutes;
+export default NotificationRoutes;
