@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, Col, Row, Typography, Button, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  type DragEndEvent,
+} from '@dnd-kit/core';
 import LinearCreateModal from './CreateTask/LinearCreateModal';
 import { useFetchQuery } from '../../../components/hooks/useFetchQuery';
+import { useEditQuery } from '../../../components/hooks/useEditQuery';
 
 const { Title } = Typography;
 
@@ -77,10 +83,15 @@ const DroppableColumn = ({
   );
 };
 
-const Tasks: React.FC = () => {
+const Tasks = () => {
   const { data: fetchedTasks = [] } = useFetchQuery<Task[]>({
     url: '/todos',
     queryKey: ['todos'],
+  });
+  const updateTodoStatus = useEditQuery({
+    url: '/todos',
+    queryKey: ['todos'],
+    successMessage: 'Task status updated',
   });
   const [tasks, setTasks] = useState<Task[]>([]);
   const [open, setOpen] = useState(false);
@@ -89,17 +100,34 @@ const Tasks: React.FC = () => {
   }, [fetchedTasks]);
 
   // 🔥 Drag End
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over) return;
+    const taskId = Number(active.id);
+    const newStatus = over.id as Task['status'];
+    const activeTask = tasks.find((task) => task.id === taskId);
 
-    const newStatus = over.id;
+    if (!activeTask || activeTask.status === newStatus) return;
+
+    const previousTasks = tasks;
 
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === active.id ? { ...task, status: newStatus } : task
+        task.id === taskId ? { ...task, status: newStatus } : task
       )
+    );
+
+    updateTodoStatus.mutate(
+      {
+        id: taskId,
+        payload: { status: newStatus },
+      },
+      {
+        onError: () => {
+          setTasks(previousTasks);
+        },
+      }
     );
   };
 
