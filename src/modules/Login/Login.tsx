@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, Col, Form, Input, Row, Button, Checkbox, Divider } from 'antd';
 import { GoogleOutlined, AppleOutlined } from '@ant-design/icons';
 import './login.css';

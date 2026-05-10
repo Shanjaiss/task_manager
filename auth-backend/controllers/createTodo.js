@@ -1,4 +1,22 @@
 import db from '../config/db.js';
+export const GetTodos = async (req, res) => {
+  try {
+    const sql = `
+      SELECT id, title, description, status
+      FROM todo_apps
+      ORDER BY id DESC
+    `;
+
+    const { rows } = await db.query(sql);
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: 'Something went wrong',
+    });
+  }
+};
 
 export const CreateTodo = async (req, res) => {
   try {

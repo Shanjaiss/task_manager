@@ -13,7 +13,7 @@ export const Signup: React.FC<SignupProps> = ({ setSignup }) => {
   const [form] = Form.useForm();
 
   const createUser = useCreateQuery({
-    url: '/auth/register',
+    url: '/register',
     queryKey: ['users'], // better than ["tasks"]
   });
 

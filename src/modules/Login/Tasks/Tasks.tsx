@@ -1,24 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Typography, Button, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import LinearCreateModal from './CreateTask/LinearCreateModal';
+import { useFetchQuery } from '../../../components/hooks/useFetchQuery';
 
 const { Title } = Typography;
 
 type Task = {
   id: number;
   title: string;
+  description: string;
   status: 'todo' | 'inProgress' | 'testing' | 'completed';
 };
-
-const initialTasks: Task[] = [
-  { id: 1, title: 'Design UI', status: 'todo' },
-  { id: 2, title: 'Build API', status: 'inProgress' },
-  { id: 3, title: 'Write Tests', status: 'testing' },
-  { id: 4, title: 'Deploy App', status: 'completed' },
-  { id: 5, title: 'Fix Bugs', status: 'todo' },
-];
 
 const statuses: Task['status'][] = [
   'todo',
@@ -49,7 +43,11 @@ const DraggableTask = ({ task }: { task: Task }) => {
       size='small'
       style={style}
     >
-      {task.title}
+      <div>
+        {' '}
+        <h2> {task.title}</h2>
+      </div>
+      <div> {task.description} </div>
     </Card>
   );
 };
@@ -80,19 +78,15 @@ const DroppableColumn = ({
 };
 
 const Tasks: React.FC = () => {
-  const [tasks, setTasks] = useState(initialTasks);
+  const { data: fetchedTasks = [] } = useFetchQuery<Task[]>({
+    url: '/todos',
+    queryKey: ['todos'],
+  });
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [open, setOpen] = useState(false);
-
-  // 🔥 Create Task
-  const handleCreateTask = (title: string) => {
-    const newItem: Task = {
-      id: Date.now(),
-      title,
-      status: 'todo',
-    };
-
-    setTasks((prev) => [newItem, ...prev]);
-  };
+  useEffect(() => {
+    setTasks(fetchedTasks);
+  }, [fetchedTasks]);
 
   // 🔥 Drag End
   const handleDragEnd = (event: any) => {
@@ -140,11 +134,7 @@ const Tasks: React.FC = () => {
       </DndContext>
 
       {/* Linear Modal */}
-      <LinearCreateModal
-        open={open}
-        onClose={() => setOpen(false)}
-        onCreate={handleCreateTask}
-      />
+      <LinearCreateModal open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };

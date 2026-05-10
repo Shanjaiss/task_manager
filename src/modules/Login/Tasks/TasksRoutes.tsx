@@ -4,7 +4,6 @@ import Loader from '../../../components/loader/Loader';
 import ProtectedRoute from '../../ProtectedRoutes';
 
 const Tasks = lazy(() => import('./Tasks'));
-const CreateTask = lazy(() => import('./CreateTask/LinearCreateModal'));
 
 const NotFound = lazy(() => import('../../../components/404/NotFound'));
 
