@@ -15,7 +15,7 @@ app.use(
 
 app.use(express.json());
 
-app.use('/api/auth', router);
+app.use('/api', router);
 
 app.listen(5001, () => {
   console.log('Server running on port 5001');

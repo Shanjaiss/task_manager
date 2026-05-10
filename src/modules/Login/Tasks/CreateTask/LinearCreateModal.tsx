@@ -1,35 +1,37 @@
 import { Modal, Input, Tag, Space, Button } from 'antd';
 import { useState } from 'react';
+import { useCreateQuery } from '../../../../components/hooks/useCreateQuery';
 
-const LinearCreateModal = ({ open, onClose, onCreate }: any) => {
+const LinearCreateModal = ({ open, onClose }: any) => {
   const [title, setTitle] = useState('');
-  const [desc, setDesc] = useState('');
+  const [description, setDescription] = useState('');
+
+  const createTodo = useCreateQuery({
+    url: '/createtodo',
+    queryKey: ['todos'], // 🔥 better key (future fetch)
+  });
 
   const handleCreate = () => {
     if (!title.trim()) return;
 
-    onCreate(title);
-    setTitle('');
-    setDesc('');
-    onClose();
+    createTodo.mutate(
+      {
+        title,
+        description,
+      },
+      {
+        onSuccess: () => {
+          setTitle('');
+          setDescription('');
+          onClose();
+        },
+      }
+    );
   };
 
   return (
-    <Modal
-      open={open}
-      onCancel={onClose}
-      footer={null}
-      centered
-      width={600}
-      // styles={{
-      //   content: {
-      //     background: '#1e1e1e',
-      //     borderRadius: 12,
-      //     padding: 20,
-      //   },
-      // }}
-    >
-      {/* 🔥 Title Input */}
+    <Modal open={open} onCancel={onClose} footer={null} centered width={600}>
+      {/* Title */}
       <Input
         placeholder='Issue title'
         value={title}
@@ -39,27 +41,21 @@ const LinearCreateModal = ({ open, onClose, onCreate }: any) => {
         style={{
           fontSize: 20,
           fontWeight: 500,
-          background: 'transparent',
-          color: '#fff',
         }}
-        onPressEnter={handleCreate}
+        onPressEnter={handleCreate} // ✅ now works
       />
 
-      {/* 🔥 Description */}
+      {/* Description */}
       <Input.TextArea
         placeholder='Add description...'
-        value={desc}
-        onChange={(e) => setDesc(e.target.value)}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
         bordered={false}
         autoSize
-        style={{
-          marginTop: 8,
-          background: 'transparent',
-          color: '#aaa',
-        }}
+        style={{ marginTop: 8 }}
       />
 
-      {/* 🔥 Tags Row */}
+      {/* Tags */}
       <Space style={{ marginTop: 16, flexWrap: 'wrap' }}>
         <Tag color='blue'>Todo</Tag>
         <Tag>Priority</Tag>
@@ -68,20 +64,21 @@ const LinearCreateModal = ({ open, onClose, onCreate }: any) => {
         <Tag>Labels</Tag>
       </Space>
 
-      {/* 🔥 Footer */}
+      {/* Footer */}
       <div
         style={{
           marginTop: 20,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
         }}
       >
-        <span style={{ fontSize: 12, color: '#888' }}>
-          Press Enter to create
-        </span>
+        <span style={{ fontSize: 12 }}>Press Enter to create</span>
 
-        <Button type='primary' onClick={handleCreate}>
+        <Button
+          type='primary'
+          loading={createTodo.isPending}
+          onClick={handleCreate}
+        >
           Create issue
         </Button>
       </div>

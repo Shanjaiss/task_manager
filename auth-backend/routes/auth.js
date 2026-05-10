@@ -5,7 +5,7 @@ import { CreateTodo } from '../controllers/createTodo.js';
 const router = express.Router();
 
 router.post('/register', Register);
-router.post('/login', Login);
+router.post('/auth/login', Login);
 router.post('/createtodo', CreateTodo);
 
 export default router;
