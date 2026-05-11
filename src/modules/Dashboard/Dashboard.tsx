@@ -1,14 +1,24 @@
-import React from 'react';
-import { Card, Row, Col } from 'antd';
+import { Card, Row, Col, Spin } from 'antd';
 import { Pie, Column } from '@ant-design/plots';
+import { useFetchQuery } from '../../components/hooks/useFetchQuery';
 
-const Dashboard: React.FC = () => {
-  // 🔥 Mock Data (replace with API later)
+type Task = {
+  id: number;
+  status: 'todo' | 'inProgress' | 'testing' | 'completed';
+};
+
+const Dashboard = () => {
+  const { data: tasks = [], isLoading } = useFetchQuery<Task[]>({
+    url: '/todos',
+    queryKey: ['todos'],
+  });
   const stats = {
-    total: 25,
-    completed: 18,
-    pending: 5,
-    inProgress: 2,
+    total: tasks.length,
+    completed: tasks.filter((task) => task.status === 'completed').length,
+    pending: tasks.filter((task) => task.status === 'todo').length,
+    inProgress: tasks.filter(
+      (task) => task.status === 'inProgress' || task.status === 'testing'
+    ).length,
   };
 
   // 📊 Pie Chart (Task Status)
@@ -28,11 +38,11 @@ const Dashboard: React.FC = () => {
     },
   };
 
-  // 📊 Column Chart (Today Tasks)
+  // 📊 Column Chart (Live Task Distribution)
   const todayData = [
-    { type: 'Completed', value: 5 },
-    { type: 'Pending', value: 3 },
-    { type: 'In Progress', value: 2 },
+    { type: 'Completed', value: stats.completed },
+    { type: 'Pending', value: stats.pending },
+    { type: 'In Progress', value: stats.inProgress },
   ];
 
   const columnConfig = {
@@ -47,6 +57,7 @@ const Dashboard: React.FC = () => {
   return (
     <div>
       <h1>Dashboard</h1>
+      {isLoading ? <Spin /> : null}
 
       {/* 🔹 Cards */}
       <Row gutter={16}>
