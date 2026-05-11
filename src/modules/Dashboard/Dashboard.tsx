@@ -1,6 +1,7 @@
-import { Card, Row, Col, Spin } from 'antd';
+import { Card, Row, Col } from 'antd';
 import { Pie, Column } from '@ant-design/plots';
 import { useFetchQuery } from '../../components/hooks/useFetchQuery';
+import Loader from '../../components/loader/Loader';
 
 type Task = {
   id: number;
@@ -57,7 +58,7 @@ const Dashboard = () => {
   return (
     <div>
       <h1>Dashboard</h1>
-      {isLoading ? <Spin /> : null}
+      {isLoading ? <Loader /> : null}
 
       {/* 🔹 Cards */}
       <Row gutter={16}>
